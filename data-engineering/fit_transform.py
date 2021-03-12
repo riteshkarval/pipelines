@@ -1,15 +1,11 @@
-import pandas as pd
-import os
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer
 from datetime import datetime
-from joblib import Parallel, delayed
 from sklearn.pipeline import FeatureUnion, _fit_transform_one, _transform_one, _name_estimators
 from scipy import sparse
-
-inpath = "/data/filter"
-test_fs_path = "/data/test_fs"
-train_fs_path = "/data/train_fs"
+from joblib import Parallel, delayed
+import re
+import pandas as pd
 
 class FeatureSelector(BaseEstimator, TransformerMixin):
 
@@ -192,76 +188,3 @@ def make_union(*transformers, **kwargs):
                         .format(list(kwargs.keys())[0]))
     return PandasFeatureUnion(
         _name_estimators(transformers), n_jobs=n_jobs, verbose=verbose)
-
-union = make_union(
-    make_pipeline(
-        FeatureSelector('genres'),
-        DictionaryVectorizer('name')
-    ),
-    make_pipeline(
-        FeatureSelector('homepage'),
-        Binarizer(lambda x: isinstance(x, float), 'missing_homepage')
-    ),
-    make_pipeline(
-        FeatureSelector('keywords'),
-        DictionaryVectorizer('name'),
-        TopFeatures(0.5)
-    ),
-    make_pipeline(
-        FeatureSelector('original_language'),
-        Binarizer(lambda x: x == 'en', 'en')
-    ),
-    make_pipeline(
-        FeatureSelector('production_companies'),
-        DictionaryVectorizer('name'),
-        TopFeatures(1)
-    ),
-    make_pipeline(
-        FeatureSelector('production_countries'),
-        DictionaryVectorizer('name'),
-        TopFeatures(25)
-    ),
-    make_pipeline(
-        FeatureSelector('release_date'),
-        DateTransformer()
-    ),
-    make_pipeline(
-        FeatureSelector('spoken_languages'),
-        ItemCounter(),
-        Binarizer(lambda x: x > 1, 'multilingual')
-    ),
-    make_pipeline(
-        FeatureSelector('original_language'),
-        Binarizer(lambda x: x == 'Released', 'Released')
-    ),    
-    make_pipeline(
-        FeatureSelector('cast'),
-        DictionaryVectorizer('name'),
-        TopFeatures(0.25),
-        SumTransformer('top_cast_count')
-    ),
-    make_pipeline(
-        FeatureSelector('crew'),
-        DictionaryVectorizer('name', False),
-        TopFeatures(1)
-    ),
-    make_pipeline(
-        FeatureSelector(['budget', 'runtime', 'vote_average'])
-    ),
-    make_pipeline(
-        FeatureSelector(['popularity', 'vote_count']),
-        MeanTransformer('popularity_vote')
-    )
-    )
-
-if __name__ == "__main__":
-    data = pd.read_csv(os.path.join(inpath, "tmdb_filter.csv"))
-    X_train, X_test, y_train, y_test = train_test_split(data.drop(['revenue'], axis=1), data['revenue']) 
-    
-    union.fit(X_train)
-
-    X_train_T = union.transform(X_train)
-    X_test_T = union.transform(X_test)
-
-    print(X_train_T.shape)
-    print(X_test_T.shape)
