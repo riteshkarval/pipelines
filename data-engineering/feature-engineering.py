@@ -221,7 +221,6 @@ if __name__ == "__main__":
     FLAGS, unparsed = parser.parse_known_args()
 
     data = pd.read_csv(os.path.join(inpath, "tmdb_filter.csv"))
-    X_train, X_test = train_test_split(data) 
     union = make_union(
         make_pipeline(
             FeatureSelector('genres'),
@@ -282,13 +281,23 @@ if __name__ == "__main__":
             MeanTransformer('popularity_vote')
         )
     )
+    X_train, X_test = train_test_split(data)  
+    
     union.fit(X_train)
 
     X_train_T = union.transform(X_train)
     X_test_T = union.transform(X_test)
-
+    
     print(X_train_T.head())
     print(X_test_T.shape)
+    
+    # removing duplicate columns
+    X_train_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
+    X_test_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
+    
+    print(X_train_T.head())
+    print(X_test_T.shape)
+    
     
     # Committing features
     authToken = os.getenv("DKUBE_USER_ACCESS_TOKEN")
