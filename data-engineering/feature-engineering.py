@@ -297,7 +297,7 @@ if __name__ == "__main__":
     # featureset to use
     fs = [FLAGS.train_fs, FLAGS.test_fs]
     # Commit featuresets
-    resp = api.commit_featureset(name=fs[0], df=train_df)
+    resp = api.commit_featureset(name=fs[0], df=X_train_T)
     print("train featureset commit response:", resp)
-    resp = api.commit_featureset(name=fs[1], df=test_df)
+    resp = api.commit_featureset(name=fs[1], df=X_test_T)
     print("test featureset commit response:", resp)
