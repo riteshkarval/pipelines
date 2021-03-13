@@ -13,7 +13,7 @@ import yaml
 from dkube.sdk import *
 
 
-inpath = "/data/filter"
+inpath = "/data/clean"
 test_fs_path = "/data/test_fs"
 train_fs_path = "/data/train_fs"
 

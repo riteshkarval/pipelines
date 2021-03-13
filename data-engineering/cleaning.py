@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 inpath = "/data/merge"
-outpath = "/data/filter"
+outpath = "/data/clean"
 
     
 if __name__ == "__main__":
