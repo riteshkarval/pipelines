@@ -12,6 +12,10 @@ if __name__ == "__main__":
     print(data.shape)
     filtered_data = data.loc[data['revenue'] != 0]
     filtered_data['revenue'].dropna(inplace=True)
+    print(filtered_data.shape)
+    
+    # removing duplicate columns
+    filtered_data = filtered_data.loc[:,~filtered_data.columns.duplicated()]
 
     print(filtered_data.shape)
 
