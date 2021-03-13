@@ -291,6 +291,14 @@ if __name__ == "__main__":
     print(X_train_T.head())
     print(X_test_T.shape)
     
+    # removing duplicate columns
+    X_train_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
+    X_test_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
+    
+    print(X_train_T.head())
+    print(X_test_T.shape)
+    
+    
     # Committing features
     authToken = os.getenv("DKUBE_USER_ACCESS_TOKEN")
     # Get client handle
