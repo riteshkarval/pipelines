@@ -20,6 +20,8 @@ inpath = "/data/clean"
 test_fs_path = "/data/test_fs"
 train_fs_path = "/data/train_fs"
 
+# it simply takes the name of the column we want to extract and if we use it, 
+# it will 'spit out' the data column of our Data Frame.
 class FeatureSelector(BaseEstimator, TransformerMixin):
 
     def __init__(self, feature_names):
@@ -44,6 +46,10 @@ def extract_items(list_, key, all_=True):
     else:
         return sub(eval(list_)[0][key].strip())
 
+# This one is a bit more complex. It's role is to:
+# 1st - extract values from dictionaries,
+# 2nd - join them in one string,
+# 3rd - dummify it using sklearn Count Vectorizer.
 class DictionaryVectorizer(BaseEstimator, TransformerMixin):
     
     def __init__(self, key, all_=True):
@@ -61,9 +67,7 @@ class DictionaryVectorizer(BaseEstimator, TransformerMixin):
         data = self.vectorizer.transform(genres)
         return pd.DataFrame(data.toarray(), columns=self.vectorizer.get_feature_names(), index=X.index)
 
-
-
-
+# This transformer expects dummified data set and extract most popular features.
 class TopFeatures(BaseEstimator, TransformerMixin):
     
     def __init__(self, percent):
@@ -81,7 +85,7 @@ class TopFeatures(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X[self.columns]
 
-
+# Sum Transformer simply computes a sum across given features.
 class SumTransformer(BaseEstimator, TransformerMixin):
     
     def __init__(self, series_name):
@@ -93,8 +97,7 @@ class SumTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X.sum(axis=1).to_frame(self.series_name)
 
-
-
+# Biniarizer takes as an input function that decides whether or not label value as True or False.
 class Binarizer(BaseEstimator, TransformerMixin):
     
     def __init__(self, condition, name):
@@ -119,6 +122,7 @@ def get_month(date):
 def get_weekday(date):
     return datetime.strptime(date, '%Y-%m-%d').strftime('%a')
 
+# As mentioned earlier, this transformer takes a date in string format and extract values of interest.
 class DateTransformer(BaseEstimator, TransformerMixin):
     
     def __init__(self):
@@ -137,6 +141,7 @@ class DateTransformer(BaseEstimator, TransformerMixin):
 def get_list_len(list_):
     return len(eval(list_))
 
+# Item Counter counts how many items are in a list.
 class ItemCounter(BaseEstimator, TransformerMixin):
         
     def __init__(self):
@@ -148,7 +153,8 @@ class ItemCounter(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X.apply(lambda x: int(get_list_len(x)))
 
-
+# After our transformation vote_count and popularity are even more correlated. 
+# It's time to combine them into one feature. I believe taking their average is good enough.
 class MeanTransformer(BaseEstimator, TransformerMixin):
     
     def __init__(self, name):
