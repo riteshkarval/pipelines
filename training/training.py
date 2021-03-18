@@ -27,16 +27,12 @@ if __name__ == "__main__":
     api = DkubeApi(token=authToken)
 
     # Read features
-    feature_df = api.read_featureset(name = fs) 
+    feature_df = api.read_featureset(name = fs)
     Y = feature_df['revenue']
     X = feature_df.drop(['revenue']
     
     ########--- Train ---########
-
     for_params = dict(n_estimators=np.linspace(10,40,4).astype(int), min_samples_split=(2,3), min_samples_leaf=(1,2,3))
-    
-    forest_grid = GridSearchCV(RandomForestRegressor(random_state=42), for_params, cv=10)
-    
-    forest_grid.fit(X, Y)
-    
+    forest_grid = GridSearchCV(RandomForestRegressor(random_state=42), for_params, cv=10) 
+    forest_grid.fit(X, Y) 
     print(f'Forest:\n\t *best params: {forest_grid.best_params_}\n\t *best score: {forest_grid.best_score_}')
