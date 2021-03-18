@@ -281,21 +281,16 @@ if __name__ == "__main__":
             MeanTransformer('popularity_vote')
         )
     )
-    X_train, X_test = train_test_split(data)  
-    
-    union.fit(X_train)
+    union.fit(data)
 
-    X_train_T = union.transform(X_train)
-    X_test_T = union.transform(X_test)
-    
-    print(X_train_T.head())
-    print(X_test_T.shape)
-    
+    data = union.transform(data)
     # removing duplicate columns
-    X_train_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
-    X_test_T = X_train_T.loc[:,~X_train_T.columns.duplicated()]
+    data = data.loc[:,~data.columns.duplicated()]
     
-    print(X_train_T.head())
+    X_train, X_test = train_test_split(data)
+
+    
+    print(X_train_T.shape)
     print(X_test_T.shape)
     
     
