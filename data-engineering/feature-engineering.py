@@ -290,7 +290,7 @@ if __name__ == "__main__":
     # removing duplicate columns
     data = data.loc[:,~data.columns.duplicated()]
     
-    X_train, X_test = train_test_split(data)
+    X_train_T, X_test_T = train_test_split(data)
 
     
     print(X_train_T.shape)
