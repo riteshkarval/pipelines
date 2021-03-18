@@ -12,6 +12,9 @@ import argparse
 import yaml
 from dkube.sdk import *
 
+import random
+random.seed(42)
+
 
 inpath = "/data/clean"
 test_fs_path = "/data/test_fs"
