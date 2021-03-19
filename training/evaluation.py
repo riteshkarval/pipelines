@@ -6,7 +6,8 @@ import joblib
 from sklearn.metrics import r2_score
 import mlflow
 
-model_path = "/opt/dkube/input"
+model_path = "/opt/dkube/model"
+fs_path = "/opt/dkube/input"
 
 if __name__ == "__main__":
 
