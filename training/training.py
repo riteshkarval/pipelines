@@ -54,4 +54,4 @@ if __name__ == "__main__":
     filename = os.path.join(out_path, "model.joblib")
     joblib.dump(best_forest, filename)
     
-    mlflow.log_metric("R2-Score", r2score)
+    mlflow.log_metric("r2_score", r2score)

@@ -39,4 +39,4 @@ if __name__ == "__main__":
 
     r2score = r2_score(Y, predicted)
     print(f'Random Forest test score: {r2score}')    
-    mlflow.log_metric("r2score", r2score)
+    mlflow.log_metric("r2_score", r2score)
