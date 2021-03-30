@@ -15,6 +15,7 @@ from dkube.sdk import *
 
 import random
 random.seed(42)
+import pickle
 
 
 inpath = "/data/clean"
@@ -319,7 +320,8 @@ if __name__ == "__main__":
     print(X_train_T.shape)
     print(X_test_T.shape)
     
-    
+    with open(os.path.join(train_fs_path, "fs-metrics.pkl"), "wb") as f:
+        pickle.dump(union, f)
     # Committing features
     authToken = os.getenv("DKUBE_USER_ACCESS_TOKEN")
     # Get client handle
