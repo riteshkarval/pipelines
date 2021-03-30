@@ -36,7 +36,8 @@ class FeatureSelector(BaseEstimator, TransformerMixin):
 
 
 def extract_items(list_, key, all_=True):
-    sub = lambda x: re.sub(r'[^A-Za-z0-9]', '_', x)
+    def sub(x):
+        return re.sub(r'[^A-Za-z0-9]', '_', x)
     if all_:
         target = []
         for dict_ in eval(list_):
@@ -58,13 +59,17 @@ class DictionaryVectorizer(BaseEstimator, TransformerMixin):
         self.all = all_
     
     def fit(self, X, y=None):
-        genres = X.apply(lambda x: extract_items(x, self.key, self.all))
+        def lam_genres(x):
+            return extract_items(x, self.key, self.all)
+        genres = X.apply(lam_genres)
         self.vectorizer = CountVectorizer().fit(genres)        
         self.columns = self.vectorizer.get_feature_names()
         return self
         
     def transform(self, X):
-        genres = X.apply(lambda x: extract_items(x, self.key))
+        def lam2_generes(x):
+            return extract_items(x, self.key)
+        genres = X.apply(lam2_generes)
         data = self.vectorizer.transform(genres)
         return pd.DataFrame(data.toarray(), columns=self.vectorizer.get_feature_names(), index=X.index)
 
@@ -109,7 +114,9 @@ class Binarizer(BaseEstimator, TransformerMixin):
         return self
     
     def transform(self, X):
-        return X.apply(lambda x : int(self.condition(x))).to_frame(self.name)
+        def lam_binarizer(x):
+            return int(self.condition(x))
+        return X.apply(lam_binarizer).to_frame(self.name)
 
 
 from datetime import datetime
@@ -152,7 +159,9 @@ class ItemCounter(BaseEstimator, TransformerMixin):
         return self
         
     def transform(self, X):
-        return X.apply(lambda x: int(get_list_len(x)))
+        def lam_itemcounter(x):
+            return int(get_list_len(x))
+        return X.apply(lam_itemcounter)
 
 # After our transformation vote_count and popularity are even more correlated. 
 # It's time to combine them into one feature. I believe taking their average is good enough.
@@ -221,7 +230,14 @@ def make_union(*transformers, **kwargs):
                         .format(list(kwargs.keys())[0]))
     return PandasFeatureUnion(
         _name_estimators(transformers), n_jobs=n_jobs, verbose=verbose)
-
+def test_missinghome(x):
+    return isinstance(x, float)
+def test_orilang(x):
+    return x == 'en'
+def test_multilingual(x):
+    return x > 1
+def test_released(x):
+    return x == 'Released'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -238,7 +254,7 @@ if __name__ == "__main__":
         ),
         make_sequence(
             FeatureSelector('homepage'),
-            Binarizer(lambda x: isinstance(x, float), 'missing_homepage')
+            Binarizer(test_missinghome, 'missing_homepage')
         ),
         make_sequence(
             FeatureSelector('keywords'),
@@ -247,7 +263,7 @@ if __name__ == "__main__":
         ),
         make_sequence(
             FeatureSelector('original_language'),
-            Binarizer(lambda x: x == 'en', 'en')
+            Binarizer(test_orilang, 'en')
         ),
         make_sequence(
             FeatureSelector('production_companies'),
@@ -266,11 +282,11 @@ if __name__ == "__main__":
         make_sequence(
             FeatureSelector('spoken_languages'),
             ItemCounter(),
-            Binarizer(lambda x: x > 1, 'multilingual')
+            Binarizer(test_multilingual, 'multilingual')
         ),
         make_sequence(
             FeatureSelector('original_language'),
-            Binarizer(lambda x: x == 'Released', 'Released')
+            Binarizer(test_released, 'Released')
         ),    
         make_sequence(
             FeatureSelector('cast'),
