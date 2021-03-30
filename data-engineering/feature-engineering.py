@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import make_pipeline, make_union
+from sklearn.pipeline import make_pipeline as make_sequence
+from sklearn.pipeline import make_union
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer
 import re, os
@@ -231,61 +232,61 @@ if __name__ == "__main__":
 
     data = pd.read_csv(os.path.join(inpath, "tmdb_filter.csv"))
     union = make_union(
-        make_pipeline(
+        make_sequence(
             FeatureSelector('genres'),
             DictionaryVectorizer('name')
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('homepage'),
             Binarizer(lambda x: isinstance(x, float), 'missing_homepage')
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('keywords'),
             DictionaryVectorizer('name'),
             TopFeatures(0.5)
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('original_language'),
             Binarizer(lambda x: x == 'en', 'en')
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('production_companies'),
             DictionaryVectorizer('name'),
             TopFeatures(1)
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('production_countries'),
             DictionaryVectorizer('name'),
             TopFeatures(25)
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('release_date'),
             DateTransformer()
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('spoken_languages'),
             ItemCounter(),
             Binarizer(lambda x: x > 1, 'multilingual')
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('original_language'),
             Binarizer(lambda x: x == 'Released', 'Released')
         ),    
-        make_pipeline(
+        make_sequence(
             FeatureSelector('cast'),
             DictionaryVectorizer('name'),
             TopFeatures(0.25),
             SumTransformer('top_cast_count')
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector('crew'),
             DictionaryVectorizer('name', False),
             TopFeatures(1)
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector(['budget', 'runtime', 'vote_average', 'revenue'])
         ),
-        make_pipeline(
+        make_sequence(
             FeatureSelector(['popularity', 'vote_count']),
             MeanTransformer('popularity_vote')
         )
